@@ -16,7 +16,9 @@ namespace Hearthstone_Deck_Tracker.Utility.Analytics
 		{
 			if(!Config.Instance.GoogleAnalytics)
 				return;
-			var point = new InfluxPointBuilder("hdt_app_start").Tag("version", version.ToVersionString()).Tag("login_type", loginType).Tag("new", isNew);
+			var point = new InfluxPointBuilder("hdt_app_start")
+				.Tag("version", version.ToVersionString()).Tag("login_type", loginType).Tag("new", isNew)
+				.Tag("auto_upload", Config.Instance.HsReplayAutoUpload).Tag("id", Config.Instance.Id);
 #if(SQUIRREL)
 			point.Tag("squirrel", true);
 #else
@@ -25,6 +27,12 @@ namespace Hearthstone_Deck_Tracker.Utility.Analytics
 			WritePoint(point.Build());
 		}
 
+		public static void OnHsReplayAutoUploadChanged(bool newState)
+		{
+			if(!Config.Instance.GoogleAnalytics)
+				return;
+			WritePoint(new InfluxPointBuilder("hdt_hsreplay_autoupload_changed").Tag("new_state", newState).Build());
+		}
 
 		public static void OnGameEnd(BnetGameType gameType)
 		{
@@ -60,6 +68,20 @@ namespace Hearthstone_Deck_Tracker.Utility.Analytics
 			{
 				Log.Debug(ex.ToString());
 			}
+		}
+
+		public static void OnGameUpload(int tries)
+		{
+			if(!Config.Instance.GoogleAnalytics)
+				return;
+			WritePoint(new InfluxPointBuilder("hdt_hsreplay_upload_counter", false).Field("tries", tries).Build());
+		}
+
+		public static void OnGameUploadFailed(bool emptyId, WebExceptionStatus status = WebExceptionStatus.UnknownError)
+		{
+			if(!Config.Instance.GoogleAnalytics)
+				return;
+			WritePoint(new InfluxPointBuilder("hdt_hsreplay_upload_failed_counter").Tag("empty_id", emptyId).Tag("status", status).Build());
 		}
 	}
 }

@@ -1,10 +1,9 @@
-﻿#region
+#region
 
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Windows;
 using System.Xml.Serialization;
 using Hearthstone_Deck_Tracker.Enums;
 using Hearthstone_Deck_Tracker.Utility;
@@ -391,6 +390,9 @@ namespace Hearthstone_Deck_Tracker
 		public bool FlashHsOnTurnStart = true;
 
 		[DefaultValue(false)]
+		public bool ForceLocalReplayViewer = false;
+
+		[DefaultValue(false)]
 		public bool ForceMouseHook = false;
 
 		[DefaultValue(false)]
@@ -530,6 +532,33 @@ namespace Hearthstone_Deck_Tracker
 
 		[DefaultValue(true)]
 		public bool HighlightLastDrawn = true;
+
+		[DefaultValue(true)]
+		public bool HsReplayAutoUpload = true;
+
+		[DefaultValue(true)]
+		public bool HsReplayUploadRanked = true;
+
+		[DefaultValue(true)]
+		public bool HsReplayUploadCasual = true;
+
+		[DefaultValue(true)]
+		public bool HsReplayUploadArena = true;
+
+		[DefaultValue(true)]
+		public bool HsReplayUploadBrawl = true;
+
+		[DefaultValue(true)]
+		public bool HsReplayUploadFriendly = true;
+
+		[DefaultValue(true)]
+		public bool HsReplayUploadPractice = true;
+
+		[DefaultValue(true)]
+		public bool HsReplayUploadSpectator = true;
+
+		[DefaultValue("00000000-0000-0000-0000-000000000000")]
+		public string Id = Guid.Empty.ToString();
 
 		[DefaultValue(-1)]
 		public int IgnoreNewsId = -1;
@@ -1207,6 +1236,11 @@ namespace Hearthstone_Deck_Tracker
 				}
 			}
 #endif
+			if(Instance.Id == Guid.Empty.ToString())
+			{
+				Instance.Id = Guid.NewGuid().ToString();
+				Save();
+			}
 		}
 
 		public void ResetAll()
